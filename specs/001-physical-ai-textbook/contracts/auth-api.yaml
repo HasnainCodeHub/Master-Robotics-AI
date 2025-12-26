@@ -1,0 +1,359 @@
+openapi: 3.1.0
+info:
+  title: Physical AI Textbook Auth API
+  description: |
+    Authentication and user profile API for the Physical AI & Humanoid Robotics textbook.
+
+    **Personalization Rules**:
+    - Personalization MAY adjust explanation depth and optional examples
+    - Personalization MUST NOT remove content, change definitions, or alter learning objectives
+  version: 1.0.0
+  contact:
+    name: Hackathon I - Panaversity
+
+servers:
+  - url: https://railway-app-url.railway.app
+    description: Production (Railway)
+  - url: http://localhost:8001
+    description: Local development
+
+paths:
+  /api/auth/signup:
+    post:
+      operationId: signup
+      summary: Create a new user account
+      description: |
+        Creates a new user account with email/password.
+        Requires software and robotics background during signup.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+            example:
+              email: "learner@example.com"
+              password: "securePassword123"
+              software_level: "intermediate"
+              robotics_level: "beginner"
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          headers:
+            Set-Cookie:
+              description: Session cookie
+              schema:
+                type: string
+        '400':
+          description: Invalid request (validation error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/signin:
+    post:
+      operationId: signin
+      summary: Sign in to existing account
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SigninRequest'
+            example:
+              email: "learner@example.com"
+              password: "securePassword123"
+      responses:
+        '200':
+          description: Signed in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          headers:
+            Set-Cookie:
+              description: Session cookie
+              schema:
+                type: string
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/signout:
+    post:
+      operationId: signout
+      summary: Sign out and invalidate session
+      tags:
+        - Authentication
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Signed out successfully
+          headers:
+            Set-Cookie:
+              description: Cleared session cookie
+              schema:
+                type: string
+        '401':
+          description: Not authenticated
+
+  /api/auth/session:
+    get:
+      operationId: getSession
+      summary: Get current session info
+      description: Returns current user info if authenticated, null otherwise
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: Session info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+
+  /api/users/me:
+    get:
+      operationId: getCurrentUser
+      summary: Get current user profile
+      tags:
+        - User Profile
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/me/profile:
+    patch:
+      operationId: updateProfile
+      summary: Update user profile
+      description: Update software and/or robotics background levels
+      tags:
+        - User Profile
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/me/personalization:
+    get:
+      operationId: getPersonalization
+      summary: Get personalization settings for current user
+      description: |
+        Returns personalization settings based on user profile.
+        Used by frontend to adjust content display.
+      tags:
+        - Personalization
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Personalization settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalizationSettings'
+        '401':
+          description: Not authenticated (returns default settings)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalizationSettings'
+
+components:
+  schemas:
+    SignupRequest:
+      type: object
+      required:
+        - email
+        - password
+        - software_level
+        - robotics_level
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+        software_level:
+          $ref: '#/components/schemas/ExperienceLevel'
+        robotics_level:
+          $ref: '#/components/schemas/ExperienceLevel'
+
+    SigninRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserInfo'
+        message:
+          type: string
+          example: "Account created successfully"
+
+    SessionResponse:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        user:
+          $ref: '#/components/schemas/UserInfo'
+          nullable: true
+
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        software_level:
+          $ref: '#/components/schemas/ExperienceLevel'
+        robotics_level:
+          $ref: '#/components/schemas/ExperienceLevel'
+        created_at:
+          type: string
+          format: date-time
+
+    ProfileUpdateRequest:
+      type: object
+      properties:
+        software_level:
+          $ref: '#/components/schemas/ExperienceLevel'
+        robotics_level:
+          $ref: '#/components/schemas/ExperienceLevel'
+
+    PersonalizationSettings:
+      type: object
+      description: |
+        Settings that control content personalization.
+        These settings ONLY adjust presentation, never content meaning.
+      properties:
+        show_beginner_hints:
+          type: boolean
+          description: Show additional foundational explanations
+        show_advanced_examples:
+          type: boolean
+          description: Show optional advanced code patterns
+        explanation_depth:
+          type: string
+          enum: [concise, standard, detailed]
+          description: Preferred explanation verbosity
+        software_context:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          description: Software examples to emphasize
+        robotics_context:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          description: Robotics examples to emphasize
+
+    ExperienceLevel:
+      type: string
+      enum:
+        - beginner
+        - intermediate
+        - advanced
+      description: User's self-reported experience level
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+
+tags:
+  - name: Authentication
+    description: User signup, signin, signout
+  - name: User Profile
+    description: User profile management
+  - name: Personalization
+    description: Content personalization settings

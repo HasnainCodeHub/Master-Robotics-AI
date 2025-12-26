@@ -1,0 +1,396 @@
+/**
+ * Translation Component Styles
+ *
+ * Includes RTL support for Urdu content.
+ */
+
+/* ============================================
+   Translation Toggle (Segmented Control)
+   ============================================ */
+
+.translationToggle {
+  display: inline-flex;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+}
+
+.toggleButton {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--ifm-color-emphasis-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 48px;
+}
+
+.toggleButton:hover:not(:disabled) {
+  background: var(--ifm-color-emphasis-100);
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: -2px;
+}
+
+.toggleButton.active {
+  background: var(--ifm-color-primary);
+  color: white;
+}
+
+.toggleButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.hasError .toggleButton {
+  border-color: var(--ifm-color-danger);
+}
+
+/* ============================================
+   Translation FAB
+   ============================================ */
+
+.translationFab {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background: var(--ifm-color-primary);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.translationFab:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.translationFab:focus-visible {
+  outline: 3px solid var(--ifm-color-primary-light);
+  outline-offset: 2px;
+}
+
+.translationFab:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.fabIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fabLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ============================================
+   Language Indicator Badge
+   ============================================ */
+
+.languageIndicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.languageIndicator.en {
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-700);
+}
+
+.languageIndicator.ur {
+  background: var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-primary-darkest);
+}
+
+/* ============================================
+   Loading Spinners
+   ============================================ */
+
+.loadingSpinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+.loadingSpinnerSmall {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--ifm-color-emphasis-300);
+  border-radius: 50%;
+  border-top-color: var(--ifm-color-primary);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   Error Toast
+   ============================================ */
+
+.errorToast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ifm-color-danger-lightest);
+  border: 1px solid var(--ifm-color-danger-light);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1100;
+  max-width: 90%;
+  width: 400px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.errorToastContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.errorIcon {
+  color: var(--ifm-color-danger);
+  flex-shrink: 0;
+}
+
+.errorMessage {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.errorMessage strong {
+  font-size: 14px;
+  color: var(--ifm-color-danger-darkest);
+}
+
+.errorMessage span {
+  font-size: 12px;
+  color: var(--ifm-color-danger-dark);
+}
+
+.errorToastActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.retryButton {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--ifm-color-danger);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.retryButton:hover {
+  background: var(--ifm-color-danger-dark);
+}
+
+.dismissButton {
+  padding: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--ifm-color-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.dismissButton:hover {
+  background: var(--ifm-color-danger-light);
+}
+
+/* ============================================
+   RTL Support for Urdu Content
+   ============================================ */
+
+/* Global RTL when language is Urdu */
+html[lang="ur"],
+html[data-language="ur"] {
+  direction: rtl;
+}
+
+/* Translated content styling */
+.translatedContent,
+.urdu-text {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', serif;
+  line-height: 2;
+}
+
+/* Preserve LTR for code and technical terms */
+.translatedContent code,
+.translatedContent pre,
+.translatedContent .preserve-term,
+.urdu-text code,
+.urdu-text pre,
+.urdu-text .preserve-term {
+  direction: ltr;
+  unicode-bidi: embed;
+  font-family: var(--ifm-font-family-monospace);
+}
+
+/* Navigation stays LTR */
+html[lang="ur"] nav,
+html[data-language="ur"] nav {
+  direction: ltr;
+}
+
+/* Code blocks stay LTR */
+html[lang="ur"] pre,
+html[lang="ur"] code,
+html[data-language="ur"] pre,
+html[data-language="ur"] code {
+  direction: ltr;
+  text-align: left;
+}
+
+/* ============================================
+   Translated Content Indicator
+   ============================================ */
+
+[data-translated="true"]::before {
+  content: 'Translated from English';
+  display: block;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  background: var(--ifm-color-info-lightest);
+  border: 1px solid var(--ifm-color-info-light);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--ifm-color-info-darkest);
+  direction: ltr;
+  text-align: left;
+}
+
+/* ============================================
+   Mobile Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+  .translationToggle {
+    /* Hide header toggle on mobile, use FAB instead */
+    display: none;
+  }
+
+  .translationFab {
+    bottom: 80px; /* Above chatbot FAB */
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+  }
+
+  .errorToast {
+    width: calc(100% - 32px);
+    max-width: none;
+    left: 16px;
+    right: 16px;
+    transform: none;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Show header toggle on desktop */
+@media (min-width: 769px) {
+  .translationFab {
+    /* FAB visible on desktop too, but smaller */
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+  }
+}
+
+/* ============================================
+   Dark Mode Support
+   ============================================ */
+
+[data-theme='dark'] .translationToggle {
+  border-color: var(--ifm-color-emphasis-400);
+}
+
+[data-theme='dark'] .toggleButton {
+  color: var(--ifm-color-emphasis-400);
+}
+
+[data-theme='dark'] .toggleButton:hover:not(:disabled) {
+  background: var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] .languageIndicator.en {
+  background: var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-emphasis-800);
+}
+
+[data-theme='dark'] .errorToast {
+  background: rgba(220, 38, 38, 0.15);
+  border-color: rgba(220, 38, 38, 0.3);
+}

@@ -1,0 +1,413 @@
+openapi: 3.1.0
+info:
+  title: Physical AI Textbook RAG API
+  description: |
+    Retrieval-Augmented Generation API for the Physical AI & Humanoid Robotics textbook.
+
+    **RAG Safety Rules (NON-NEGOTIABLE)**:
+    - All answers MUST be grounded in retrieved textbook content
+    - No external knowledge is permitted
+    - Refusal is ALWAYS preferred over speculation
+  version: 1.0.0
+  contact:
+    name: Hackathon I - Panaversity
+
+servers:
+  - url: https://railway-app-url.railway.app
+    description: Production (Railway)
+  - url: http://localhost:8001
+    description: Local development
+
+paths:
+  /api/chat:
+    post:
+      operationId: sendChatMessage
+      summary: Send a question to the RAG chatbot
+      description: |
+        Sends a question and receives a grounded answer or explicit refusal.
+        If `selected_text` is provided, the answer is limited to that context only.
+      tags:
+        - Chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+            examples:
+              basic_question:
+                summary: Basic question
+                value:
+                  question: "What is a ROS 2 topic?"
+              with_selected_text:
+                summary: Question with selected text
+                value:
+                  question: "Explain this concept"
+                  selected_text: "A topic is a named bus over which nodes exchange messages."
+      responses:
+        '200':
+          description: Successful response (grounded answer or refusal)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+              examples:
+                grounded_answer:
+                  summary: Grounded answer with sources
+                  value:
+                    answer: "A ROS 2 topic is a named channel for message exchange between nodes..."
+                    sources:
+                      - chunk_id: "550e8400-e29b-41d4-a716-446655440000"
+                        module_id: "module-2-ros2"
+                        chapter_id: "02-topics-and-messages"
+                        section_heading: "## Understanding Topics"
+                        score: 0.89
+                    was_refusal: false
+                refusal:
+                  summary: Explicit refusal
+                  value:
+                    answer: "I can only answer questions from the textbook content. This topic doesn't appear to be covered in the course materials."
+                    sources: []
+                    was_refusal: true
+                    refusal_reason: "insufficient_retrieval"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/chat/sessions:
+    get:
+      operationId: getChatSessions
+      summary: Get user's chat sessions
+      description: Returns list of chat sessions for authenticated user
+      tags:
+        - Chat
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChatSession'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/chat/sessions/{session_id}/messages:
+    get:
+      operationId: getSessionMessages
+      summary: Get messages in a session
+      tags:
+        - Chat
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChatMessage'
+
+  /api/content/chunks:
+    get:
+      operationId: getContentChunks
+      summary: Get content chunks (admin/debug)
+      description: Returns content chunks for a specific chapter
+      tags:
+        - Content
+      parameters:
+        - name: module_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: chapter_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of chunks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chunks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContentChunk'
+
+  /api/translate:
+    post:
+      operationId: translateChapter
+      summary: Translate chapter content to Urdu
+      description: |
+        Translates prose content to Urdu while preserving code blocks and technical terms.
+        Results are cached for subsequent requests.
+      tags:
+        - Translation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslateRequest'
+      responses:
+        '200':
+          description: Translated content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslateResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check endpoint
+      tags:
+        - System
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy]
+                  qdrant_connected:
+                    type: boolean
+                  postgres_connected:
+                    type: boolean
+
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: The user's question
+        selected_text:
+          type: string
+          maxLength: 5000
+          description: Optional selected text to limit answer context
+        session_id:
+          type: string
+          format: uuid
+          description: Optional session ID for continuity
+
+    ChatResponse:
+      type: object
+      required:
+        - answer
+        - sources
+        - was_refusal
+      properties:
+        answer:
+          type: string
+          description: The grounded answer or refusal message
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceReference'
+          description: Retrieved content chunks used for answer
+        was_refusal:
+          type: boolean
+          description: True if the chatbot refused to answer
+        refusal_reason:
+          type: string
+          enum:
+            - insufficient_retrieval
+            - out_of_scope
+            - selected_text_insufficient
+          description: Reason for refusal (only if was_refusal=true)
+        session_id:
+          type: string
+          format: uuid
+          description: Session ID for this conversation
+
+    SourceReference:
+      type: object
+      properties:
+        chunk_id:
+          type: string
+          format: uuid
+        module_id:
+          type: string
+        chapter_id:
+          type: string
+        section_heading:
+          type: string
+        score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Similarity score from vector search
+
+    ChatSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+        message_count:
+          type: integer
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceReference'
+          nullable: true
+        was_refusal:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    ContentChunk:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        text:
+          type: string
+        module_id:
+          type: string
+        chapter_id:
+          type: string
+        section_heading:
+          type: string
+        chunk_index:
+          type: integer
+
+    TranslateRequest:
+      type: object
+      required:
+        - chapter_id
+        - target_language
+      properties:
+        chapter_id:
+          type: string
+          description: ID of chapter to translate
+        target_language:
+          type: string
+          enum: [ur]
+          description: Target language (ur = Urdu)
+
+    TranslateResponse:
+      type: object
+      properties:
+        chapter_id:
+          type: string
+        target_language:
+          type: string
+        translated_content:
+          type: string
+          description: Full chapter content with prose translated
+        cached:
+          type: boolean
+          description: Whether result was served from cache
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+  - name: Chat
+    description: RAG chatbot endpoints
+  - name: Content
+    description: Content management endpoints
+  - name: Translation
+    description: Urdu translation endpoints
+  - name: System
+    description: System health and status
