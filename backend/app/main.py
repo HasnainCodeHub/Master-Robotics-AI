@@ -70,13 +70,15 @@ Retrieval-Augmented Generation API for the Physical AI & Humanoid Robotics textb
         lifespan=lifespan,
     )
 
-    # CORS middleware
+    # CORS middleware - MUST be added before any routes
+    # Note: Origins must be exact scheme+host (no paths)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins_list,
         allow_credentials=True,
-        allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
+        allow_methods=["*"],  # Allow all HTTP methods
         allow_headers=["*"],
+        expose_headers=["*"],
     )
 
     # Exception handlers
