@@ -10,7 +10,7 @@ import { useHistory } from '@docusaurus/router';
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
-import { useAuth } from '@site/src/components/Auth/AuthContext';
+import { useAuth, getAndClearRedirectUrl } from '@site/src/components/Auth';
 import type { ExperienceLevel, HardwareAccess } from '@site/src/components/Auth/types';
 import styles from './auth.module.css';
 
@@ -56,7 +56,7 @@ export default function SignupPage(): JSX.Element {
   useEffect(() => {
     if (isAuthenticated) {
       const redirectUrl = getAndClearRedirectUrl();
-      let targetPath = 'robotics-book/textbook/intro'; // default
+      let targetPath = '/Master-Robotics-AI/textbook/intro'; // default
 
       if (redirectUrl) {
         try {
@@ -132,7 +132,7 @@ export default function SignupPage(): JSX.Element {
         setSuccessMessage('Account created successfully! Redirecting...');
         setTimeout(() => {
           const redirectUrl = getAndClearRedirectUrl();
-          let targetPath = '/robotics-book/textbook/intro'; // default
+          let targetPath = '/Master-Robotics-AI/textbook/intro'; // default
 
           if (redirectUrl) {
             try {

@@ -30,7 +30,7 @@ export default function LoginPage(): JSX.Element {
   useEffect(() => {
     if (isAuthenticated) {
       const redirectUrl = getAndClearRedirectUrl();
-      let targetPath = '/robotics-book/textbook/intro'; // default
+      let targetPath = '/Master-Robotics-AI/textbook/intro'; // default
 
       if (redirectUrl) {
         try {
@@ -81,7 +81,7 @@ export default function LoginPage(): JSX.Element {
         // Redirect after success
         setTimeout(() => {
           const redirectUrl = getAndClearRedirectUrl();
-          let targetPath = '/robotics-book/textbook/intro'; // default
+          let targetPath = '/Master-Robotics-AI/textbook/intro'; // default
 
           if (redirectUrl) {
             try {
