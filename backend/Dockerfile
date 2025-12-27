@@ -26,12 +26,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 8001
+# Expose port (Railway will assign PORT dynamically)
+EXPOSE ${PORT:-8001}
 
-# Health check
+# Health check (use Railway's assigned PORT)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8001/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8001}/api/health || exit 1
 
 # Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+# Railway will set PORT env var, fallback to 8001 for local development
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8001}

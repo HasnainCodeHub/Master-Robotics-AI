@@ -38,12 +38,16 @@ class Settings(BaseSettings):
     retrieval_limit: int = 5
 
     # CORS - comma-separated list of allowed origins
-    # Default includes common development ports
+    # PRODUCTION: MUST set CORS_ORIGINS to your frontend URL
+    # Example: https://hasnaincodehub.github.io
     cors_origins: str = "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001"
 
     # Authentication (JWT)
-    # IMPORTANT: Set JWT_SECRET in production (min 32 chars)
+    # CRITICAL: MUST set JWT_SECRET in production (min 32 chars)
+    # Generate with: python -c "import secrets; print(secrets.token_hex(32))"
     jwt_secret: str = ""  # Will use fallback in auth.py if not set (dev only)
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 30
 
     @property
     def cors_origins_list(self) -> List[str]:

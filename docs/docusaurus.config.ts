@@ -23,7 +23,7 @@ const config: Config = {
   // Custom fields accessible via useDocusaurusContext()
   // These are safe to use in frontend code (process.env is only used here in Node.js)
   customFields: {
-    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8001',
+    apiBaseUrl: process.env.API_BASE_URL || 'https://master-robotics-backend-production.up.railway.app',
     isProduction: process.env.NODE_ENV === 'production',
   },
 

@@ -6,8 +6,19 @@ builder = "DOCKERFILE"
 dockerfilePath = "./Dockerfile"
 
 [deploy]
-healthcheckPath = "/health"
+healthcheckPath = "/api/health"
 healthcheckTimeout = 30
+# startCommand removed - let Dockerfile CMD handle PORT expansion
 numReplicas = 1
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
+
+# Environment variables that should be set in Railway dashboard:
+# - DATABASE_URL (PostgreSQL connection string from Railway)
+# - QDRANT_URL (Qdrant Cloud cluster URL)
+# - QDRANT_API_KEY (Qdrant Cloud API key)
+# - GOOGLE_API_KEY (Gemini API key)
+# - JWT_SECRET (Generate with: python -c "import secrets; print(secrets.token_hex(32))")
+# - ENV=production
+# - LOG_LEVEL=INFO
+# - CORS_ORIGINS (Your frontend URL, e.g., https://hasnaincodehub.github.io)
