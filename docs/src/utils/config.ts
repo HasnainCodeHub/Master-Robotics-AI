@@ -11,14 +11,17 @@
 const DEFAULT_API_URL = 'http://localhost:8001';
 
 /**
+ * Production API base URL (Railway backend).
+ */
+const PRODUCTION_API_URL = 'https://master-robotics-backend-production.up.railway.app';
+
+/**
  * Get the API base URL.
  *
  * Priority:
  * 1. window.__BACKEND_URL__ (runtime override)
- * 2. Default to localhost for development
- *
- * NOTE: For production, set window.__BACKEND_URL__ in your deployment
- * or use a relative path if backend is on same origin.
+ * 2. Production URL if on production domain
+ * 3. Default to localhost for development
  *
  * @returns The API base URL
  */
@@ -39,10 +42,8 @@ export function getApiBaseUrl(): string {
                        !window.location.hostname.includes('127.0.0.1');
 
   if (isProduction) {
-    // In production, use relative path (same origin) or configure __BACKEND_URL__
-    // For now, we'll use same origin with /api prefix
-    // This assumes the backend is proxied or on the same domain
-    return window.location.origin;
+    // In production, use the Railway backend URL
+    return PRODUCTION_API_URL;
   }
 
   return DEFAULT_API_URL;
