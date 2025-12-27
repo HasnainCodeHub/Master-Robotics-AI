@@ -11,11 +11,11 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://physical-ai-robotics.github.io',
-  baseUrl: '/robotics-book/',
+  url: 'https://hasnaincodehub.github.io',
+  baseUrl: '/Master-Robotics-AI/',
 
-  organizationName: 'physical-ai-robotics',
-  projectName: 'robotics-book',
+  organizationName: 'HasnainCodeHub',
+  projectName: 'Master-Robotics-AI',
 
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
@@ -78,7 +78,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/physical-ai-robotics/robotics-book',
+          href: 'https://github.com/HasnainCodeHub/Master-Robotics-AI',
           label: 'GitHub',
           position: 'right',
         },
@@ -134,7 +134,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/physical-ai-robotics/robotics-book',
+              href: 'https://github.com/HasnainCodeHub/Master-Robotics-AI',
             },
           ],
         },
