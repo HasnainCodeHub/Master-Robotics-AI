@@ -26,8 +26,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application code
 COPY . .
 
-# Copy docs directory for content ingestion (seeding Qdrant)
-COPY ../docs /app/docs
+# Note: docs directory is NOT copied here - Qdrant is pre-seeded externally
+# The backend retrieves content from Qdrant at runtime
 
 # Expose port (Railway will assign PORT dynamically)
 EXPOSE ${PORT:-8001}
