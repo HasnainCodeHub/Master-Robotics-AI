@@ -18,9 +18,16 @@ from agents import (
     OpenAIChatCompletionsModel,
     AsyncOpenAI,
 )
+import os
 
 from app.core.config import get_settings
 from app.core.logging import get_logger
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
+# Set OPENAI_API_KEY for agents SDK using GOOGLE_API_KEY (Gemini via OpenAI-compatible API)
+os.environ["OPENAI_API_KEY"] = os.getenv("GOOGLE_API_KEY", "")
 
 logger = get_logger(__name__)
 
@@ -67,6 +74,26 @@ def get_llm_model() -> OpenAIChatCompletionsModel:
         )
         logger.info("gemini_llm_model_created", model="gemini-2.0-flash")
     return _llm_model
+
+# ============================================
+# RUN CONFIG (TRACING DISABLED)
+# ============================================
+
+_run_config = None
+
+
+def get_run_config() -> RunConfig:
+    """Get RunConfig with tracing disabled."""
+    global _run_config
+    if _run_config is None:
+        _run_config = RunConfig(
+            model=get_llm_model(),
+            model_provider=get_gemini_client(),
+            tracing_disabled=True,
+        )
+        logger.info("agent_run_config_created", tracing_disabled=True)
+    return _run_config
+
 
 
 # ============================================
