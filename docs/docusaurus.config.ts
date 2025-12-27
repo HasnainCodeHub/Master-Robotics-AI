@@ -3,8 +3,8 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'Physical AI & Humanoid Robotics',
-  tagline: 'An AI-Native Textbook for Building Intelligent Embodied Systems',
+  title: 'Embodied AI',
+  tagline: 'Master Physical Intelligence & Humanoid Robotics',
   favicon: 'img/favicon.ico',
 
   future: {
@@ -57,9 +57,9 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'Physical AI & Humanoid Robotics',
+      title: 'Embodied AI',
       logo: {
-        alt: 'Physical AI Logo',
+        alt: 'Embodied AI Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -67,7 +67,7 @@ const config: Config = {
           type: 'doc',
           docId: 'intro',
           position: 'left',
-          label: 'Curriculum',
+          label: 'Book',
         },
         {
           type: 'custom-search',
