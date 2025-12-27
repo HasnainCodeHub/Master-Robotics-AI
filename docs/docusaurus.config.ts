@@ -67,7 +67,7 @@ const config: Config = {
           type: 'doc',
           docId: 'intro',
           position: 'left',
-          label: 'Textbook',
+          label: 'Curriculum',
         },
         {
           type: 'custom-search',
