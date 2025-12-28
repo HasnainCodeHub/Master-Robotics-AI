@@ -279,6 +279,11 @@ body {
   border-bottom-color: var(--color-gray-800);
 }
 
+.navbar__logo img {
+  height: 38px;
+  width: auto;
+}
+
 .navbar__title {
   font-family: var(--font-display);
   font-weight: 700;

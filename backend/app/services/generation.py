@@ -18,29 +18,23 @@ from agents import (
     OpenAIChatCompletionsModel,
     AsyncOpenAI,
 )
-import os
 
 from app.core.config import get_settings
 from app.core.logging import get_logger
-from dotenv import load_dotenv, find_dotenv
-
-load_dotenv(find_dotenv())
-
-# Set OPENAI_API_KEY for agents SDK using GOOGLE_API_KEY (Gemini via OpenAI-compatible API)
-os.environ["OPENAI_API_KEY"] = os.getenv("GOOGLE_API_KEY", "")
 
 logger = get_logger(__name__)
 
 # ============================================
-# GLOBAL CLIENT (reuse single instance)
+# GLOBAL GEMINI CLIENT (REUSED)
 # ============================================
 
-_gemini_client = None
+_gemini_client: AsyncOpenAI | None = None
 
 
 def get_gemini_client() -> AsyncOpenAI:
     """Get or create Gemini client via OpenAI-compatible endpoint."""
     global _gemini_client
+
     if _gemini_client is None:
         settings = get_settings()
         api_key = settings.google_api_key
@@ -52,55 +46,63 @@ def get_gemini_client() -> AsyncOpenAI:
             api_key=api_key.strip(),
             base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
         )
+
         logger.info("gemini_generation_client_created")
+
     return _gemini_client
 
 
 # ============================================
-# GEMINI MODEL VIA OPENAI AGENTS SDK
+# GEMINI MODEL (OPENAI AGENTS SDK WRAPPER)
 # ============================================
 
-_llm_model = None
+_llm_model: OpenAIChatCompletionsModel | None = None
 
 
 def get_llm_model() -> OpenAIChatCompletionsModel:
-    """Get Gemini model wrapped in OpenAI Agents SDK model."""
+    """Get Gemini model wrapped in OpenAI Agents SDK."""
     global _llm_model
+
     if _llm_model is None:
         client = get_gemini_client()
+
         _llm_model = OpenAIChatCompletionsModel(
             model="gemini-2.5-flash",
             openai_client=client,
         )
-        logger.info("gemini_llm_model_created", model="gemini-2.0-flash")
+
+        logger.info("gemini_llm_model_created", model="gemini-2.5-flash")
+
     return _llm_model
+
 
 # ============================================
 # RUN CONFIG (TRACING DISABLED)
 # ============================================
 
-_run_config = None
+_run_config: RunConfig | None = None
 
 
 def get_run_config() -> RunConfig:
     """Get RunConfig with tracing disabled."""
     global _run_config
+
     if _run_config is None:
         _run_config = RunConfig(
             model=get_llm_model(),
             model_provider=get_gemini_client(),
             tracing_disabled=True,
         )
+
         logger.info("agent_run_config_created", tracing_disabled=True)
+
     return _run_config
 
 
-
 # ============================================
-# TUTOR AGENT (RAG-STRICT)
+# TUTOR AGENT (STRICT RAG)
 # ============================================
 
-# System instructions enforcing grounded answering
 AGENT_INSTRUCTIONS = """
 You are a teaching assistant for the Physical AI & Humanoid Robotics textbook.
 
@@ -118,12 +120,11 @@ SPECIAL GREETING BEHAVIOR:
 - If the user's input is a greeting (e.g. "hi", "hello", "hey", "assalam o alaikum"):
   - Respond with a polite greeting
   - Briefly explain that you can help with the Physical AI & Humanoid Robotics textbook
-  - Suggest 3–5 topics that ARE covered in the textbook
+  - Suggest 3–5 high-level topics that ARE covered in the textbook
   - Do NOT go into details unless the user asks
 
 The greeting response MUST:
-- Stay general (no deep explanations)
-- Mention only high-level topics
+- Stay general
 - Avoid technical depth
 - Avoid adding knowledge not present in the textbook
 
@@ -145,25 +146,19 @@ def get_tutor_agent() -> Agent:
 
 
 # ============================================
-# AGENT RUNNER
+# AGENT EXECUTION
 # ============================================
 
 async def run_agent(question: str, context: str) -> str:
     """
     Run the tutor agent with the given question and context.
-
-    Args:
-        question: User's question.
-        context: Retrieved textbook content (MUST be non-empty).
-
-    Returns:
-        Grounded answer string from the agent.
     """
     prompt = (
         f"CONTEXT:\n{context}\n\n"
         f"---\n\n"
         f"QUESTION: {question}\n\n"
-        f"Remember: Answer ONLY based on the CONTEXT above. Do not use any external knowledge."
+        f"Remember: Answer ONLY based on the CONTEXT above. "
+        f"Do not use any external knowledge."
     )
 
     tutor_agent = get_tutor_agent()
@@ -178,6 +173,7 @@ async def run_agent(question: str, context: str) -> str:
         result = await Runner.run(
             starting_agent=tutor_agent,
             input=prompt,
+            run_config=get_run_config(),  # ✅ TRACING DISABLED HERE
         )
 
         answer = result.final_output
@@ -188,28 +184,23 @@ async def run_agent(question: str, context: str) -> str:
         )
 
         return answer
+
     except Exception as e:
-        logger.error("agent_run_failed", error=str(e), error_type=type(e).__name__)
+        logger.error(
+            "agent_run_failed",
+            error=str(e),
+            error_type=type(e).__name__,
+        )
         raise
 
 
 # ============================================
-# PUBLIC API (Preserves existing interface)
+# PUBLIC API (STABLE INTERFACE)
 # ============================================
 
 async def generate_grounded_answer(question: str, context: str) -> str:
     """
     Generate an answer strictly grounded in the provided context.
-
-    Args:
-        question: User's question.
-        context: Retrieved textbook content (MUST be non-empty).
-
-    Returns:
-        Grounded answer string.
-
-    Raises:
-        ValueError: If context is empty (should never happen - caller must check).
     """
     if not context or not context.strip():
         raise ValueError("Context cannot be empty - this is a safety violation")

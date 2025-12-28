@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Embodied AI',
   tagline: 'Master Physical Intelligence & Humanoid Robotics',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/logo.png',
 
   future: {
     v4: true,
@@ -60,7 +60,7 @@ const config: Config = {
       title: 'Embodied AI',
       logo: {
         alt: 'Embodied AI Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo.png',
       },
       items: [
         {
