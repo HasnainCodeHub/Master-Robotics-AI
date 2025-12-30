@@ -7,6 +7,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useHistory } from '@docusaurus/router';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
@@ -18,6 +19,7 @@ export default function LoginPage(): JSX.Element {
   const history = useHistory();
   const { login, isAuthenticated, error, clearError, isLoading } = useAuth();
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const defaultRedirect = useBaseUrl('/textbook/intro');
 
   // Form state
   const [email, setEmail] = useState('');
@@ -30,7 +32,7 @@ export default function LoginPage(): JSX.Element {
   useEffect(() => {
     if (isAuthenticated) {
       const redirectUrl = getAndClearRedirectUrl();
-      let targetPath = '/Master-Robotics-AI/textbook/intro'; // default
+      let targetPath = defaultRedirect;
 
       if (redirectUrl) {
         try {
@@ -48,7 +50,7 @@ export default function LoginPage(): JSX.Element {
 
       history.push(targetPath);
     }
-  }, [isAuthenticated, history]);
+  }, [isAuthenticated, history, defaultRedirect]);
 
   // Focus first input on mount
   useEffect(() => {
@@ -81,7 +83,7 @@ export default function LoginPage(): JSX.Element {
         // Redirect after success
         setTimeout(() => {
           const redirectUrl = getAndClearRedirectUrl();
-          let targetPath = '/Master-Robotics-AI/textbook/intro'; // default
+          let targetPath = defaultRedirect;
 
           if (redirectUrl) {
             try {
@@ -104,7 +106,7 @@ export default function LoginPage(): JSX.Element {
         // Error is handled by AuthContext
       }
     },
-    [email, password, rememberMe, login, history]
+    [email, password, rememberMe, login, history, defaultRedirect]
   );
 
   const displayError = localError || error;

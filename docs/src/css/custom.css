@@ -873,6 +873,7 @@ code {
    RESPONSIVE TWEAKS
    ============================================ */
 
+/* Large tablets and small laptops (769px - 996px) */
 @media (max-width: 996px) {
   :root {
     --ifm-navbar-height: 3.5rem;
@@ -881,12 +882,104 @@ code {
   .navbar__title {
     font-size: 1rem;
   }
+
+  .navbar__items {
+    gap: var(--space-1);
+  }
+
+  .navbar__item {
+    padding: var(--space-2);
+  }
 }
 
+/* Tablets (481px - 768px) */
+@media (max-width: 768px) {
+  :root {
+    --ifm-navbar-padding-horizontal: 1rem;
+    --ifm-footer-padding-horizontal: 1rem;
+  }
+
+  .markdown h1 {
+    font-size: var(--text-3xl);
+  }
+
+  .markdown h2 {
+    font-size: var(--text-xl);
+    margin-top: var(--space-8);
+  }
+
+  .pagination-nav__link {
+    padding: 1rem;
+  }
+
+  .pagination-nav__label {
+    font-size: 0.9375rem;
+  }
+}
+
+/* Mobile devices (320px - 480px) */
 @media (max-width: 576px) {
+  :root {
+    --ifm-navbar-height: 3rem;
+    --ifm-navbar-padding-horizontal: 0.75rem;
+    --ifm-footer-padding-vertical: 2rem;
+    --ifm-footer-padding-horizontal: 1rem;
+  }
+
   .button--lg {
     padding: 0.875rem 1.5rem;
     font-size: 1rem;
+  }
+
+  .navbar__logo img {
+    height: 32px;
+  }
+
+  .navbar__title {
+    font-size: 0.875rem;
+  }
+
+  /* Improve touch targets */
+  .navbar__link {
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .menu__link {
+    padding: 0.625rem 0.75rem;
+  }
+
+  /* Better footer on mobile */
+  .footer__links {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .footer__col {
+    text-align: center;
+  }
+}
+
+/* Very small mobile devices (< 380px) */
+@media (max-width: 380px) {
+  :root {
+    --ifm-navbar-height: 2.75rem;
+  }
+
+  .navbar__title {
+    font-size: 0.8125rem;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .button--lg {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9375rem;
+  }
+
+  .markdown h1 {
+    font-size: var(--text-2xl);
   }
 }
 

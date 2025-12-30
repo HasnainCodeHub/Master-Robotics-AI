@@ -5,10 +5,13 @@
  * - Customizable title, message, and button labels
  * - Keyboard accessible (ESC to cancel, Enter to confirm)
  * - Focus trapping
- * - Professional styling consistent with auth components
+ * - Body scroll locking when open
+ * - Professional centered modal styling
+ * - Uses React Portal to render at document root (avoids z-index issues)
  */
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './styles.module.css';
 
 interface ConfirmDialogProps {
@@ -36,6 +39,43 @@ export function ConfirmDialog({
 }: ConfirmDialogProps): JSX.Element | null {
   const modalRef = useRef<HTMLDivElement>(null);
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const scrollPositionRef = useRef<number>(0);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+
+  /**
+   * Create portal container on mount (client-side only for SSR compatibility).
+   */
+  useEffect(() => {
+    // Only run on client side
+    if (typeof window !== 'undefined') {
+      setPortalContainer(document.body);
+    }
+  }, []);
+
+  /**
+   * Lock body scroll when modal is open.
+   */
+  useEffect(() => {
+    if (isOpen) {
+      // Store current scroll position
+      scrollPositionRef.current = window.scrollY;
+      // Lock body scroll
+      document.body.classList.add('body-scroll-locked');
+      document.body.style.top = `-${scrollPositionRef.current}px`;
+    } else {
+      // Unlock body scroll
+      document.body.classList.remove('body-scroll-locked');
+      document.body.style.top = '';
+      // Restore scroll position
+      window.scrollTo(0, scrollPositionRef.current);
+    }
+
+    return () => {
+      // Cleanup on unmount
+      document.body.classList.remove('body-scroll-locked');
+      document.body.style.top = '';
+    };
+  }, [isOpen]);
 
   /**
    * Handle ESC key to cancel.
@@ -107,14 +147,14 @@ export function ConfirmDialog({
     [isLoading, onCancel]
   );
 
-  // Don't render if not open
-  if (!isOpen) {
+  // Don't render if not open or portal not ready
+  if (!isOpen || !portalContainer) {
     return null;
   }
 
-  return (
+  const dialogContent = (
     <div
-      className={styles.modalOverlay}
+      className={styles.confirmOverlay}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -178,6 +218,9 @@ export function ConfirmDialog({
       </div>
     </div>
   );
+
+  // Use portal to render at document root, avoiding z-index issues
+  return createPortal(dialogContent, portalContainer);
 }
 
 export default ConfirmDialog;

@@ -168,7 +168,7 @@ Text to translate:
 
     try:
         response = await client.chat.completions.create(
-            model="gemini-1.5-flash",  # Free tier Gemini model
+            model="gemini-2.5-flash",  # Free tier Gemini model
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},

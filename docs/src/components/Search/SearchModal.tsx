@@ -11,6 +11,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from '@docusaurus/router';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Link from '@docusaurus/Link';
 import { useSearch } from './SearchContext';
 import { useChatbot } from '../Chatbot/ChatbotContext';
@@ -25,23 +26,20 @@ const SEARCH_DEBOUNCE_MS = 300;
 // Toast auto-hide delay
 const TOAST_DURATION_MS = 4000;
 
-// Module ID to URL path mapping
-const MODULE_PATHS: Record<string, string> = {
-  'module-1': '/docs/module-1-foundations',
-  'module-2': '/docs/module-2-ros2',
-  'module-3': '/docs/module-3-simulation',
-  'module-4': '/docs/module-4-isaac',
-  'module-5': '/docs/module-5-vla',
-  'module-6': '/docs/module-6-capstone',
+// Module display names for user-friendly labels
+const MODULE_DISPLAY_NAMES: Record<string, string> = {
+  'module-1': 'Module 1: Physical AI Foundations',
+  'module-2': 'Module 2: ROS 2 Fundamentals',
+  'module-3': 'Module 3: Simulation & Digital Twin',
+  'module-4': 'Module 4: NVIDIA Isaac Ecosystem',
+  'module-5': 'Module 5: Vision-Language-Action',
+  'capstone': 'Capstone: Integrated Humanoid System',
+  'appendix': 'Appendices',
+  'root': 'General',
 };
 
-function getResultUrl(result: SearchResult): string {
-  const modulePath = MODULE_PATHS[result.module_id] || '/docs';
-  // Build URL from module and chapter
-  if (result.chapter_id) {
-    return `${modulePath}/${result.chapter_id}`;
-  }
-  return modulePath;
+function getModuleDisplayName(moduleId: string): string {
+  return MODULE_DISPLAY_NAMES[moduleId] || moduleId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 export function SearchModal() {
@@ -103,12 +101,28 @@ export function SearchModal() {
     }, SEARCH_DEBOUNCE_MS);
   }, [setQuery, performSearch]);
 
-  // Navigate to result
+  // Get base URL for proper routing on GitHub Pages
+  const textbookBaseUrl = useBaseUrl('/textbook');
+
+  // Navigate to result with proper baseUrl handling
   const handleNavigate = useCallback((result: SearchResult) => {
-    const url = getResultUrl(result);
+    const { module_id, chapter_id } = result;
+    let path: string;
+
+    // Handle root-level documents (glossary, intro)
+    if (module_id === 'root' || !module_id) {
+      path = `${textbookBaseUrl}/${chapter_id}`;
+    } else if (chapter_id === 'index' || !chapter_id) {
+      // Handle index pages - just link to the module
+      path = `${textbookBaseUrl}/${module_id}`;
+    } else {
+      // Standard module/chapter URLs
+      path = `${textbookBaseUrl}/${module_id}/${chapter_id}`;
+    }
+
     closeSearch();
-    history.push(url);
-  }, [closeSearch, history]);
+    history.push(path);
+  }, [closeSearch, history, textbookBaseUrl]);
 
   // Show auth toast with auto-hide
   const showAuthToastWithTimeout = useCallback(() => {
@@ -255,7 +269,7 @@ export function SearchModal() {
                   onClick={() => handleNavigate(result)}
                 >
                   <div className={styles.resultHeader}>
-                    <span className={styles.resultModule}>{result.module_id}</span>
+                    <span className={styles.resultModule}>{getModuleDisplayName(result.module_id)}</span>
                     <span className={styles.resultScore}>
                       {Math.round(result.score * 100)}% match
                     </span>

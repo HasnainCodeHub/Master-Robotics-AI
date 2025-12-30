@@ -16,7 +16,7 @@ import { useChatbot } from './ChatbotContext';
 import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { ChatSidebar } from './ChatSidebar';
-import { sendChatMessage, getLastSession } from './api';
+import { sendChatMessage, createSession } from './api';
 import { translateToUrdu } from '../Translation/api';
 import { useAuth } from '../Auth';
 import type { Message, ChatMode } from './types';
@@ -41,44 +41,27 @@ export function Chatbot() {
     setSessionId,
     clearPendingAction,
     loadMessages,
+    clearMessages,
   } = useChatbot();
 
   // Track if we've processed the pending action
   const pendingActionProcessed = useRef(false);
   const [showSidebar, setShowSidebar] = useState(false);
-  const lastSessionLoaded = useRef(false);
 
-  // Load last session when chat opens (only for authenticated users)
-  useEffect(() => {
-    if (
-      state.isOpen &&
-      isAuthenticated &&
-      !lastSessionLoaded.current &&
-      state.messages.length === 0
-    ) {
-      lastSessionLoaded.current = true;
-
-      getLastSession()
-        .then(session => {
-          if (session && session.messages.length > 0) {
-            const messages: Message[] = session.messages.map(msg => ({
-              id: msg.id,
-              role: msg.role,
-              content: msg.content,
-              timestamp: new Date(msg.created_at),
-              sources: msg.sources || undefined,
-              isRefusal: msg.was_refusal,
-              refusalReason: msg.refusal_reason,
-            }));
-            setSessionId(session.id);
-            loadMessages(messages);
-          }
-        })
-        .catch(() => {
-          // Silently fail - user can start fresh
-        });
+  // Handle creating a new chat session
+  const handleNewChat = useCallback(async () => {
+    try {
+      // Clear current messages first
+      clearMessages();
+      // Create a new session on the backend
+      const response = await createSession();
+      setSessionId(response.session_id);
+    } catch (err) {
+      // If creation fails, just clear locally (session will be created on first message)
+      clearMessages();
+      setSessionId(null);
     }
-  }, [state.isOpen, isAuthenticated, state.messages.length, setSessionId, loadMessages]);
+  }, [clearMessages, setSessionId]);
 
   const handleSubmit = useCallback(async (question: string, selectedText: string | null, mode: ChatMode = 'general') => {
     // Add user message
@@ -228,26 +211,48 @@ export function Chatbot() {
             <h2 className={styles.chatTitle}>Ask the Textbook</h2>
             <div className={styles.headerActions}>
               {isAuthenticated && (
-                <button
-                  className={styles.historyButton}
-                  onClick={() => setShowSidebar(!showSidebar)}
-                  aria-label="Chat history"
-                  title="Chat history"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                <>
+                  <button
+                    className={styles.newChatHeaderButton}
+                    onClick={handleNewChat}
+                    aria-label="New chat"
+                    title="Start new chat"
                   >
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                  </svg>
-                </button>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                  <button
+                    className={styles.historyButton}
+                    onClick={() => setShowSidebar(!showSidebar)}
+                    aria-label="Chat history"
+                    title="Chat history"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  </button>
+                </>
               )}
               <button
                 className={styles.closeButton}

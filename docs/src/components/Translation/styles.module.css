@@ -359,6 +359,73 @@ html[data-language="ur"] code {
   }
 }
 
+/* Small mobile */
+@media (max-width: 480px) {
+  .translationFab {
+    bottom: 70px;
+    left: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+  }
+
+  .fabIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .fabLabel {
+    font-size: 9px;
+  }
+
+  .errorToast {
+    top: 70px;
+    width: calc(100% - 24px);
+    left: 12px;
+    right: 12px;
+    padding: 10px 12px;
+  }
+
+  .errorMessage strong {
+    font-size: 13px;
+  }
+
+  .errorMessage span {
+    font-size: 11px;
+  }
+
+  .retryButton {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 380px) {
+  .translationFab {
+    bottom: 65px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+  }
+
+  .fabLabel {
+    display: none;
+  }
+
+  .errorToast {
+    left: 8px;
+    right: 8px;
+    width: calc(100% - 16px);
+  }
+
+  .errorToastActions {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
 /* Show header toggle on desktop */
 @media (min-width: 769px) {
   .translationFab {

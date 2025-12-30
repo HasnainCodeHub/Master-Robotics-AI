@@ -42,7 +42,7 @@ const socialLinks = [
   },
   {
     name: 'Project Repo',
-    url: 'https://github.com/HasnainCodeHub/physical-ai-robotics-book',
+    url: 'https://github.com/HasnainCodeHub/Master-Robotics-AI',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
@@ -147,13 +147,7 @@ export default function DeveloperSection(): React.ReactNode {
           </div>
         </div>
 
-        {/* Attribution */}
-        <p className={`${styles.attribution} ${isVisible ? styles.visible : ''}`}>
-          Built with{' '}
-          <span className={styles.heart}>&#10084;</span>
-          {' '}using{' '}
-          <span className={styles.techHighlight}>Docusaurus + React + Claude AI</span>
-        </p>
+        
       </div>
     </section>
   );
