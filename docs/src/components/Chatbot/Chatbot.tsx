@@ -17,6 +17,7 @@ import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { ChatSidebar } from './ChatSidebar';
 import { sendChatMessage, getLastSession } from './api';
+import { translateToUrdu } from '../Translation/api';
 import { useAuth } from '../Auth';
 import type { Message, ChatMode } from './types';
 import styles from './styles.module.css';
@@ -99,30 +100,45 @@ export function Chatbot() {
     setError(null);
 
     try {
-      // Send to backend - this is the ONLY place we communicate with the API
-      const response = await sendChatMessage({
-        question,
-        selected_text: selectedText,
-        session_id: state.sessionId,
-        mode,
-      });
+      // Handle translation mode separately - use translation API directly
+      if (mode === 'translate_urdu' && selectedText) {
+        const translationResponse = await translateToUrdu(selectedText);
 
-      // Save session ID
-      if (response.session_id && response.session_id !== state.sessionId) {
-        setSessionId(response.session_id);
+        // Add assistant message with translation
+        const assistantMessage: Message = {
+          id: generateId(),
+          role: 'assistant',
+          content: `**Urdu Translation:**\n\n${translationResponse.translated_text}\n\n---\n*Technical terms preserved: ${translationResponse.preserved_terms.join(', ') || 'None'}*`,
+          timestamp: new Date(),
+          isRefusal: false,
+        };
+        addMessage(assistantMessage);
+      } else {
+        // Send to RAG backend for explain/general modes
+        const response = await sendChatMessage({
+          question,
+          selected_text: selectedText,
+          session_id: state.sessionId,
+          mode,
+        });
+
+        // Save session ID
+        if (response.session_id && response.session_id !== state.sessionId) {
+          setSessionId(response.session_id);
+        }
+
+        // Add assistant message
+        const assistantMessage: Message = {
+          id: generateId(),
+          role: 'assistant',
+          content: response.answer,
+          timestamp: new Date(),
+          sources: response.sources,
+          isRefusal: response.was_refusal,
+          refusalReason: response.refusal_reason,
+        };
+        addMessage(assistantMessage);
       }
-
-      // Add assistant message
-      const assistantMessage: Message = {
-        id: generateId(),
-        role: 'assistant',
-        content: response.answer,
-        timestamp: new Date(),
-        sources: response.sources,
-        isRefusal: response.was_refusal,
-        refusalReason: response.refusal_reason,
-      };
-      addMessage(assistantMessage);
 
     } catch (error) {
       // Handle errors gracefully
@@ -151,12 +167,13 @@ export function Chatbot() {
       if (pendingAction.mode === 'explain_selected_text') {
         question = `Please explain this passage from the textbook:\n\n"${pendingAction.text}"`;
       } else if (pendingAction.mode === 'translate_urdu') {
-        question = `Please translate this passage to Urdu:\n\n"${pendingAction.text}"`;
+        // For translation, show what we're translating
+        question = `Translate to Urdu:\n\n"${pendingAction.text.substring(0, 200)}${pendingAction.text.length > 200 ? '...' : ''}"`;
       } else {
         question = pendingAction.text;
       }
 
-      // Auto-send the message
+      // Auto-send the message (translation will use the full text via selectedText)
       handleSubmit(question, pendingAction.text, pendingAction.mode);
       clearPendingAction();
     }
