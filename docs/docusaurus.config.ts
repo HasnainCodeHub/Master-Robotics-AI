@@ -39,7 +39,7 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           routeBasePath: 'textbook',
-          editUrl: 'https://github.com/physical-ai-robotics/robotics-book/tree/main/docs/',
+          editUrl: 'https://github.com/HasnainCodeHub/Master-Robotics-AI/tree/main/docs/',
         },
         blog: false,
         theme: {

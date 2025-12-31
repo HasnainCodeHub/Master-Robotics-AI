@@ -1,4 +1,4 @@
-# Physical AI & Humanoid Robotics Textbook Project
+# Embodied AI - Interactive Robotics Textbook
 
 [![Docusaurus](https://img.shields.io/badge/Docusaurus-v4-green.svg)](https://docusaurus.io/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-blue.svg)](https://fastapi.tiangolo.com/)
@@ -8,14 +8,14 @@
 
 ## Project Title & One-Paragraph Overview
 
-This project delivers an AI-native, comprehensive, and interactive textbook on Physical AI and Humanoid Robotics. Built with Docusaurus and FastAPI, it features a RAG-powered AI tutor, global spotlight search, session management, authentication with personalization, Urdu translation support, and a professional UX. Leveraging Spec-Kit Plus and Claude Code agents, it showcases an innovative approach to content generation, curriculum design, and interactive learning experiences, culminating in a fully deployed, production-ready educational platform.
+This project delivers an AI-native, comprehensive, and interactive textbook on Embodied AI and Humanoid Robotics. Built with Docusaurus and FastAPI, it features a RAG-powered AI tutor, global spotlight search, session management, authentication with personalization, Urdu translation support, and a professional UX. Leveraging Spec-Kit Plus and Claude Code agents, it showcases an innovative approach to content generation, curriculum design, and interactive learning experiences, culminating in a fully deployed, production-ready educational platform.
 
 ## Quick Start
 
 ```bash
 # Clone repository
-git clone https://github.com/physical-ai-robotics/robotics-book.git
-cd robotics-book
+git clone https://github.com/HasnainCodeHub/Master-Robotics-AI.git
+cd Master-Robotics-AI
 
 # Backend setup
 cd backend
@@ -33,12 +33,12 @@ npm start
 
 ## Live Demo
 
--   **Frontend**: [https://physical-ai-robotics.github.io/robotics-book/](https://physical-ai-robotics.github.io/robotics-book/)
--   **API Docs**: [Backend OpenAPI Documentation](https://your-backend-url.railway.app/docs)
+-   **Frontend**: [https://hasnaincodehub.github.io/Master-Robotics-AI/](https://hasnaincodehub.github.io/Master-Robotics-AI/)
+-   **API Docs**: [Backend OpenAPI Documentation](https://master-robotics-backend-production.up.railway.app/docs)
 
 ## Problem Statement
 
-The rapid evolution of Physical AI and Humanoid Robotics necessitates up-to-date, engaging, and accessible educational resources. Traditional textbook creation struggles to keep pace with these advancements. This project addresses this by demonstrating an AI-driven pipeline that accelerates content development, integrates interactive learning tools (like RAG chatbots), and facilitates localization, making cutting-edge knowledge available to a global audience efficiently.
+The rapid evolution of Embodied AI and Humanoid Robotics necessitates up-to-date, engaging, and accessible educational resources. Traditional textbook creation struggles to keep pace with these advancements. This project addresses this by demonstrating an AI-driven pipeline that accelerates content development, integrates interactive learning tools (like RAG chatbots), and facilitates localization, making cutting-edge knowledge available to a global audience efficiently.
 
 ## Key Features
 
@@ -95,8 +95,8 @@ The rapid evolution of Physical AI and Humanoid Robotics necessitates up-to-date
 
 ## Curriculum Structure
 
-### Module 1: Physical AI Foundations
--   What is Physical AI?
+### Module 1: Embodied AI Foundations
+-   What is Embodied AI?
 -   Sensors and Perception
 -   Actuators and Control
 -   Physical Constraints and Real-World Challenges
@@ -320,7 +320,7 @@ The project was developed iteratively across six distinct phases:
 
 1.  **Phase 1: Curriculum Intelligence**: Established the pedagogical framework and detailed curriculum structure for the textbook, defining modules, topics, and learning objectives.
 
-2.  **Phase 2: Textbook Content**: Generated the core textual content for the Physical AI and Humanoid Robotics textbook, covering fundamental concepts, advanced topics, and practical applications.
+2.  **Phase 2: Textbook Content**: Generated the core textual content for the Embodied AI and Humanoid Robotics textbook, covering fundamental concepts, advanced topics, and practical applications.
 
 3.  **Phase 3: RAG Chatbot Backend**: Implemented a Retrieval Augmented Generation (RAG) system with:
     - FastAPI backend with authentication
@@ -597,7 +597,7 @@ This project is open-source under the **MIT License**.
 ```
 MIT License
 
-Copyright (c) 2025 Physical AI & Humanoid Robotics Textbook Project
+Copyright (c) 2025 Embodied AI Textbook Project
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -631,8 +631,8 @@ SOFTWARE.
 
 ## Contact & Support
 
--   **Issues**: [GitHub Issues](https://github.com/physical-ai-robotics/robotics-book/issues)
--   **Discussions**: [GitHub Discussions](https://github.com/physical-ai-robotics/robotics-book/discussions)
+-   **Issues**: [GitHub Issues](https://github.com/HasnainCodeHub/Master-Robotics-AI/issues)
+-   **Discussions**: [GitHub Discussions](https://github.com/HasnainCodeHub/Master-Robotics-AI/discussions)
 -   **Documentation**: See `/docs` directory for detailed guides
 
 ---
