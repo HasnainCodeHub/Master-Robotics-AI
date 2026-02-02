@@ -1,0 +1,9 @@
+{
+  "projectId": "book-backend",
+  "orgId": "HasnainCodeHub",
+  "settings": {
+    "framework": "none",
+    "rootDirectory": "backend",
+    "serverless": true
+  }
+}
