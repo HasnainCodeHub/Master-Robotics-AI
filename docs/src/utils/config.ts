@@ -11,9 +11,9 @@
 const DEFAULT_API_URL = 'http://localhost:8001';
 
 /**
- * Production API base URL (Railway backend).
+ * Production API base URL (Vercel backend).
  */
-const PRODUCTION_API_URL = 'https://master-robotics-backend-production.up.railway.app';
+const PRODUCTION_API_URL = 'https://backend-eta-eight-83.vercel.app';
 
 /**
  * Get the API base URL.
@@ -42,7 +42,7 @@ export function getApiBaseUrl(): string {
                        !window.location.hostname.includes('127.0.0.1');
 
   if (isProduction) {
-    // In production, use the Railway backend URL
+    // In production, use the Vercel backend URL
     return PRODUCTION_API_URL;
   }
 
